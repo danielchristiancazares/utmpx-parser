@@ -1,15 +1,15 @@
 utmpx-like
 ==========
 
-	This program reads in a utmpx-like file as input, parses it, and displays the data on screen with certain options to format the output.
+This program reads in a utmpx-like file as input, parses it, and displays the data on screen with certain options to format the output.
 
 How to Compile
 --------------
-	To compile the program, simply navigate to the directory containing the source files for PA4 and type 'make' into terminal.
+To compile the program, simply navigate to the directory containing the source files for PA4 and type 'make' into terminal.
 
 How to Run
 ---------
-	To run the program, type the executable name followed by an utmpx-like file.
+To run the program, type the executable name followed by an utmpx-like file.
 
 For Example:
 	
