@@ -10,8 +10,6 @@ To compile the program, simply navigate to the directory containing the source f
 How to Run
 ---------
 To run the program, type the executable name followed by an utmpx-like file.
-
-For Example:
 	
 	./a.out ./utmpx.sample
 
