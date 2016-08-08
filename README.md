@@ -1,4 +1,4 @@
-utmpx-like
+utmpx parser
 ==========
 
 This program reads in a utmpx-like file as input, parses it, and displays the data on screen with certain options to format the output.
