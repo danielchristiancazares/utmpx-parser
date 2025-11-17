@@ -9,14 +9,14 @@
 HEADERS		= mywho.h strings.h
 
 C_SRCS		= mywho.c buildUtmpInfoTable.c displayUtmpInfo.c \
-		  pa4time.c
+		  pa4time.c calcIdleTime.c
 
-ASM_SRCS	= calcIdleTime.s
+ASM_SRCS	=
 
 C_OBJS		= mywho.o buildUtmpInfoTable.o displayUtmpInfo.o \
-		  pa4time.o
+		  pa4time.o calcIdleTime.o
 
-ASM_OBJS	= calcIdleTime.o
+ASM_OBJS	=
 
 OBJS		= ${C_OBJS} ${ASM_OBJS}
 

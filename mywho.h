@@ -31,11 +31,9 @@
 #include <utmpx.h>  /* struct utmpx definition */
 #include <stddef.h> /* offsetof() macro */
 
-#define USER_SIZE ( offsetof( struct utmpx, ut_id ) - \
-                    offsetof( struct utmpx, ut_user ) )
-
-#define LINE_SIZE ( offsetof( struct utmpx, ut_pid ) - \
-                    offsetof( struct utmpx, ut_line ) )
+/* Use sizeof on actual struct fields for portability across Linux/Solaris */
+#define USER_SIZE sizeof(((struct utmpx *)0)->ut_user)
+#define LINE_SIZE sizeof(((struct utmpx *)0)->ut_line)
 
 /*
  * To pick up pid_t and time_t typedefs
@@ -62,6 +60,8 @@ int buildUtmpInfoTable( const char *utmpFilename,
 
 void displayUtmpInfo( struct utmpInfo * const table, const int entries,
                       const int displayMode );
+
+void freeUtmpInfoTable( struct utmpInfo *table, int entries );
 
 void calcIdleTime( time_t idleTime, char *idleString, int size );
 

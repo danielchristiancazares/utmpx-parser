@@ -29,8 +29,8 @@ displayUtmpInfo( struct utmpInfo * const table, const int entries, const int dis
     }
     if( displayMode == 2 )
     {
-        (void) fprintf( stdout, "%-10s %-10s %7s \n", "NAME", "LINE", "IDLE" ); 
-        while( i < 500 )
+        (void) fprintf( stdout, "%-10s %-10s %7s \n", "NAME", "LINE", "IDLE" );
+        while( i < entries )
         {
             if( table[ i ].type == USER_PROCESS )
             {
@@ -41,7 +41,7 @@ displayUtmpInfo( struct utmpInfo * const table, const int entries, const int dis
 	                  exit( 1 );
 	              }
 
-                calcIdleTime( table[i].time, timeStr, BUFSIZ );  
+                calcIdleTime( table[i].idle, timeStr, BUFSIZ );  
                 (void) fprintf( stdout, "%-10s %-10s %7s   (%s)\n", table[i].user,
                                                              table[i].line,
                                                              timeStr, 

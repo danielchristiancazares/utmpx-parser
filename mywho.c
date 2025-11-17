@@ -12,8 +12,9 @@ main( int argc, char **argv )
 {
     char fileName[BUFSIZ];
 
-    struct utmpInfo *utmpData;
-    int             cmdInput;  
+    struct utmpInfo *utmpData = NULL;
+    int             numEntries = 0;
+    int             cmdInput;
     int             cmdFlag = -1;
    
     while( (cmdInput = getopt( argc, argv, GETOPT_OPTIONS)) != -1 )
@@ -59,10 +60,15 @@ main( int argc, char **argv )
     }
     if( argc == 3)
     {
-        strcpy( fileName, argv[2] );
-        buildUtmpInfoTable( fileName, &utmpData );
+        /* Use strncpy to prevent buffer overflow */
+        strncpy( fileName, argv[2], BUFSIZ - 1 );
+        fileName[BUFSIZ - 1] = '\0';  /* Ensure null termination */
+        numEntries = buildUtmpInfoTable( fileName, &utmpData );
     }
-    displayUtmpInfo( utmpData, 500, cmdFlag ); 
-    
+    displayUtmpInfo( utmpData, numEntries, cmdFlag );
 
+    /* Clean up allocated memory */
+    freeUtmpInfoTable( utmpData, numEntries );
+
+    return 0;
 }
