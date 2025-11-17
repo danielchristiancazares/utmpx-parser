@@ -58,13 +58,15 @@ main( int argc, char **argv )
               break;
         }
     }
-    if( argc == 3)
+    /* Get filename from remaining arguments after option parsing */
+    if( optind < argc )
     {
         /* Use strncpy to prevent buffer overflow */
-        strncpy( fileName, argv[2], BUFSIZ - 1 );
+        strncpy( fileName, argv[optind], BUFSIZ - 1 );
         fileName[BUFSIZ - 1] = '\0';  /* Ensure null termination */
         numEntries = buildUtmpInfoTable( fileName, &utmpData );
     }
+
     displayUtmpInfo( utmpData, numEntries, cmdFlag );
 
     /* Clean up allocated memory */

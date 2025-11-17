@@ -39,9 +39,11 @@ buildUtmpInfoTable( const char *utmpFilename, struct utmpInfo **utmpInfoPtr )
 
     struct stat statBuffer;
     time_t accessTime;
-    time_t currentTime;
     time_t idleTime;
     char path[BUFSIZ];
+
+    /* Get current time once before loop - more efficient */
+    time_t currentTime = pa4time( NULL );
 
     /* Read all of the utmpx structs into the utmpInfoPtr */
     while( fread( &utmpxBuf, sizeof( utmpxBuf ), 1, utmpFilePtr ) == 1 ) {
@@ -53,19 +55,20 @@ buildUtmpInfoTable( const char *utmpFilename, struct utmpInfo **utmpInfoPtr )
             break;
         }
 
-        strcpy( ((*utmpInfoPtr) + numElements)->user, utmpxBuf.ut_user );
-        strcpy( ((*utmpInfoPtr) + numElements)->line, utmpxBuf.ut_line );
-        ((*utmpInfoPtr) + numElements)->type = utmpxBuf.ut_type;
-        ((*utmpInfoPtr) + numElements)->pid = utmpxBuf.ut_pid;
+        /* Use local pointer for cleaner code */
+        struct utmpInfo *entry = &((*utmpInfoPtr)[numElements]);
 
-        /* Get current time first */
-        currentTime = pa4time( &currentTime );
+        strcpy( entry->user, utmpxBuf.ut_user );
+        strcpy( entry->line, utmpxBuf.ut_line );
+        entry->type = utmpxBuf.ut_type;
+        entry->pid = utmpxBuf.ut_pid;
 
         /* Initialize accessTime to current time (0 idle if stat fails) */
         accessTime = currentTime;
 
-        strcpy( path, "/dev/");
-        strcat( path, utmpxBuf.ut_line );
+        /* Build device path using snprintf (safer than strcpy+strcat) */
+        snprintf( path, sizeof(path), "/dev/%.*s",
+                  (int)sizeof(utmpxBuf.ut_line), utmpxBuf.ut_line );
         if( stat( path, &statBuffer) == 0)
         {
             accessTime = statBuffer.st_atime;
@@ -74,17 +77,21 @@ buildUtmpInfoTable( const char *utmpFilename, struct utmpInfo **utmpInfoPtr )
         idleTime = (time_t) difftime( currentTime, accessTime );
 
         /* Store login time and idle time in the correct fields */
-        ((*utmpInfoPtr) + numElements)->time = utmpxBuf.ut_tv.tv_sec;
-        ((*utmpInfoPtr) + numElements)->idle = idleTime;
-        ((*utmpInfoPtr) + numElements)->host = (char *) calloc( BUFSIZ, sizeof( char ) );
-        if( ((*utmpInfoPtr) + numElements)->host == NULL )
+        entry->time = utmpxBuf.ut_tv.tv_sec;
+        entry->idle = idleTime;
+
+        /* Allocate exact size needed for hostname (not BUFSIZ!) */
+        size_t hostLen = strnlen( utmpxBuf.ut_host, sizeof(utmpxBuf.ut_host) );
+        entry->host = (char *) malloc( hostLen + 1 );
+        if( entry->host == NULL )
         {
-            perror( "calloc for hostname" );
+            perror( "malloc for hostname" );
             fclose( utmpFilePtr );
             freeUtmpInfoTable( *utmpInfoPtr, numElements );
             exit( 1 );
         }
-        strcpy( ((*utmpInfoPtr) + numElements)->host, utmpxBuf.ut_host );
+        strncpy( entry->host, utmpxBuf.ut_host, hostLen );
+        entry->host[hostLen] = '\0';
 
         ++numElements;
 
