@@ -1,0 +1,23 @@
+# Object files
+*.o
+
+# Executables
+mywho
+pa4
+
+# Build artifacts
+*.a
+*.so
+*.dylib
+
+# Debug files
+*.dSYM/
+*.su
+*.idb
+*.pdb
+
+# Editor backup files
+*~
+*.swp
+*.swo
+.DS_Store
