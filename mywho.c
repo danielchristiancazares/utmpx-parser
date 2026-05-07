@@ -1,68 +1,70 @@
+#include <errno.h>
 #include <getopt.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <utmp.h>
-#include <string.h>
 
 #include "mywho.h"
 #include "strings.h"
 
+static int parseFlags(int argc, char **argv);
+
 int
-main( int argc, char **argv )
+main(int argc, char **argv)
 {
-    char fileName[BUFSIZ];
+    struct utmpInfo *utmpData = NULL;
+    const char *fileName = NULL;
+    int cmdFlag;
+    int entries;
 
-    struct utmpInfo *utmpData;
-    int             cmdInput;  
-    int             cmdFlag = -1;
-   
-    while( (cmdInput = getopt( argc, argv, GETOPT_OPTIONS)) != -1 )
-    {
-        switch( cmdInput )
-        {
-          case 'h':
-              cmdFlag = 0;
-              break;
+    cmdFlag = parseFlags(argc, argv);
 
-          case 'b':
-              cmdFlag = 1;
-              break;
+    if (cmdFlag == HELP_FLAG) {
+        displayUtmpInfo(NULL, 0, cmdFlag);
+        return EXIT_SUCCESS;
+    }
 
-          case 'H':
-              cmdFlag = 2;
-              break;
+    if (optind >= argc) {
+        (void)fprintf(stderr, "Usage: mywho %s", SHORT_USAGE);
+        return EXIT_FAILURE;
+    }
 
-          case 'q':
-              cmdFlag = 3;
-              break;
+    fileName = argv[optind];
+    entries = buildUtmpInfoTable(fileName, &utmpData);
+    if (entries < 0) {
+        return EXIT_FAILURE;
+    }
 
-          case 'r':
-              cmdFlag = 4;
-              break;
+    displayUtmpInfo(utmpData, entries, cmdFlag);
+    freeUtmpInfoTable(utmpData, entries);
 
-          case 'S':
-              cmdFlag = 5;
-              break;
+    return EXIT_SUCCESS;
+}
 
-          case 'i':
-              cmdFlag = 6;
-              break;
+static int
+parseFlags(int argc, char **argv)
+{
+    int cmdInput;
+    int cmdFlag = 0;
 
-          case 'u':
-              cmdFlag = 7;
-              break;
-
-          case 'B':
-              cmdFlag = 8;
-              break;
+    while ((cmdInput = getopt(argc, argv, GETOPT_OPTIONS)) != -1) {
+        switch (cmdInput) {
+        case 'h':
+            cmdFlag |= HELP_FLAG;
+            break;
+        case 'B':
+            cmdFlag |= B_FLAG;
+            break;
+        case 'H':
+            cmdFlag |= H_FLAG;
+            break;
+        case 'q':
+            cmdFlag |= Q_FLAG;
+            break;
+        default:
+            (void)fprintf(stderr, "Usage: mywho %s", SHORT_USAGE);
+            exit(EXIT_FAILURE);
         }
     }
-    if( argc == 3)
-    {
-        strcpy( fileName, argv[2] );
-        buildUtmpInfoTable( fileName, &utmpData );
-    }
-    displayUtmpInfo( utmpData, 500, cmdFlag ); 
-    
 
+    return cmdFlag;
 }
