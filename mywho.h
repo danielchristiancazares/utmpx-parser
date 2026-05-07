@@ -35,6 +35,16 @@ void displayUtmpInfo(struct utmpInfo *table, int entries, int displayMode);
 
 void calcIdleTime(time_t idleTime, char *idleString, int size);
 
+int idleTimeSortAscending(const void *p1, const void *p2);
+int idleTimeSortDescending(const void *p1, const void *p2);
+int nameSortAscending(const void *p1, const void *p2);
+int nameSortDescending(const void *p1, const void *p2);
+int timeSortAscending(const void *p1, const void *p2);
+int timeSortDescending(const void *p1, const void *p2);
+long strToLong(char *str, int base);
+void doUptime(struct utmpInfo *utmpTable, int entries);
+void currentTerminalInfo(struct utmpInfo *utmpTable, int entries);
+
 time_t pa4time(time_t *t);
 
 #endif

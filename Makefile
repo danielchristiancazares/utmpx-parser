@@ -4,7 +4,7 @@ LDFLAGS =
 
 EXE     = mywho
 HEADERS = mywho.h strings.h
-SRCS    = mywho.c buildUtmpInfoTable.c displayUtmpInfo.c pa4time.c calcIdleTime.c
+SRCS    = mywho.c buildUtmpInfoTable.c displayUtmpInfo.c pa4time.c calcIdleTime.c extraFunctions.c
 OBJS    = $(SRCS:.c=.o)
 
 .PHONY: all clean
